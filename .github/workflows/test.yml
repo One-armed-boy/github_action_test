@@ -1,0 +1,30 @@
+name: Auto Deployment
+
+on: 
+  push:
+    # prod, release 브랜치에 push 시 작동
+    branches:
+      - main
+    
+jobs:
+  # push 의 타겟 브랜치가 release 일 때 작동하는 job
+  deploy_release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: sshConnection
+        # with 의 정보와 함께 원격 접속 수행
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          script: |
+            cd action_test
+            git checkout main
+            git pull origin main
+            npm i
+            
+      - name: .env test
+        run: |
+          echo "test=test" > .env
